@@ -6,24 +6,16 @@
 /*   By: ssottori <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 15:21:07 by ssottori          #+#    #+#             */
-/*   Updated: 2023/12/08 16:00:27 by ssottori         ###   ########.fr       */
+/*   Updated: 2023/12/09 21:40:42 by ssottori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*freebuff(char *buff)
-{
-	if (buff)
-		free(buff);
-	return (NULL);
-}
-
 /*strlen - It counts the number of characters until 
  * the null terminator \0 is encountered.
- * I,portant when allocating memory to store 
+ * Important when allocating memory to store 
  * concatenated strings in ft_strjoin.*/
-
 size_t	ft_strlen(const char *str)
 {
 	size_t	i;
@@ -35,24 +27,28 @@ size_t	ft_strlen(const char *str)
 		i++;
 	return (i);
 }
-/*isnewline - Returns 1 if a NL is found and 0 if a NL is not fine.
+
+/*isnewline - Returns 1 if a NL is found and 0 if a NL is not found.
  * Used in the loop condition of ft_read to know when 
  * to stop reading from the file descriptor 
  * (when a newline is encountered)*/
-
 int	ft_isnewline(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!str)
 		return (0);
 	while (str[i])
-		return (1);
-	i++;
+	{
+		if (str[i] == '\n')
+			return (1);
+		i++;
+	}
 	return (0);
 }
-/*strjoin - Used in ft_read to combine the content read from the fd (s2)
+
+/*strjoin - Used in ft_readfd to combine the content read from the fd (s2)
  * with the existing content(s1). 
  * It dynamically allocates memory for the result.*/
 char	*ft_strjoin(char *s1, char *s2)
@@ -70,30 +66,98 @@ char	*ft_strjoin(char *s1, char *s2)
 	if (!new_str)
 		return (NULL);
 	while (i < len1)
-		new_str[i] = s1[i++];
+	{
+		new_str[i] = s1[i];
+		i++;
+	}
 	j = 0;
 	while (j < len2)
-		new_str[i + j] = s2[j++];
+	{
+		new_str[i + j] = s2[j];
+		j++;
+	}
 	new_str[i + j] = '\0';
+	free(s1);
 	return (new_str);
 }
 
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+/* line - extracts a line from the given string until a '\n' is encountered.
+ * Allocates mem to store the concat string & frees mem of original string.
+ * Used in GNL to extract a line and add a '\n' char.*/
+char	*ft_line(char *buff)
 {
-	char	*result;
-	size_t	size;
+	size_t	i;
+	char	*line;
 
-	if (!s)
+	i = 0;
+	if (!buff[i])
 		return (NULL);
-	if (start >= ft_strlen(s))
-		return (ft_strdup(""));
-	size = ft_strlen(s + start);
-	if (size < len)
-		len = size;
-	result = (char *)malloc(sizeof(char) * (len + 1));
-	if (!result)
+	while (buff[i] && buff[i] != '\n')
+		i++;
+	line = malloc(sizeof(char) * i + 2);
+	if (!line)
 		return (NULL);
-	ft_strlcpy(result, s + start, len + 1);
-	return (result);
+	i = 0;
+	while (buff[i] && buff[i] != '\n')
+	{
+		line[i] = buff[i];
+		i++;
+	}
+	if (buff[i] && buff[i] == '\n')
+		line[i++] = '\n';
+	line[i] = '\0';
+	return (line);
+}
+
+/* readfd - important for reading from a fd in chunks of BUFF_SIZE,
+ * allocates mem for buff and uses strjoin to concat newly read data from 
+ * buff. Crucial for building cmplete lines from multiple */
+char	*ft_readfd(int fd, char *fdata)
+{
+	int		bytes_read;
+	char	*buff;
+
+	bytes_read = 1;
+	buff = (char *)malloc(sizeof(char) * (1 + BUFFER_SIZE));
+	if (!buff)
+		return (NULL);
+	while (!ft_isnewline(fdata) && bytes_read != 0)
+	{
+		bytes_read = read(fd, buff, BUFFER_SIZE);
+		if (bytes_read == -1)
+		{
+			free(buff);
+			return (NULL);
+		}
+		buff[bytes_read] = '\0';
+		fdata = ft_strjoin(fdata, buff);
+	}
+	free (buff);
+	return (fdata);
+}
+
+char	*ft_afternl(char *str)
+{
+	int		i;
+	int		j;
+	char	*line;
+
+	i = 0;
+	j = 0;
+	while (str[i] && str[i] != '\n')
+		i++;
+	if (!str[i])
+	{
+		free(str);
+		return (NULL);
+	}
+	line = (char *)malloc(sizeof(char) * (ft_strlen(str) - i + 1));
+	if (!line)
+		return (NULL);
+	i++;
+	while (str[i])
+		line[j++] = str[i++];
+	line[j] = '\0';
+	free(str);
+	return (line);
 }
