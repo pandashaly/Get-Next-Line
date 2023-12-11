@@ -6,7 +6,7 @@
 /*   By: ssottori <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 15:21:07 by ssottori          #+#    #+#             */
-/*   Updated: 2023/12/11 16:26:26 by ssottori         ###   ########.fr       */
+/*   Updated: 2023/12/11 17:04:37 by ssottori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*ft_line(char *buff)
 /* readfd - important for reading from a fd in chunks of BUFF_SIZE,
  * allocates mem for buff and uses strjoin to concat newly read data from 
  * buff. Crucial for building cmplete lines from multiple */
-char	*ft_readfd(int fd, char *fdata)
+char	*ft_readfd(int fd, char *save)
 {
 	int		bytes_read;
 	char	*buff;
@@ -99,7 +99,7 @@ char	*ft_readfd(int fd, char *fdata)
 	buff = (char *)malloc(sizeof(char) * (1 + BUFFER_SIZE));
 	if (!buff)
 		return (NULL);
-	while (!ft_isnewline(fdata) && bytes_read != 0)
+	while (!ft_isnewline(save) && bytes_read != 0)
 	{
 		bytes_read = read(fd, buff, BUFFER_SIZE);
 		if (bytes_read == -1)
@@ -108,17 +108,17 @@ char	*ft_readfd(int fd, char *fdata)
 			return (NULL);
 		}
 		buff[bytes_read] = '\0';
-		fdata = ft_strjoin(fdata, buff);
+		save = ft_strjoin(save, buff);
 	}
 	free (buff);
-	return (fdata);
+	return (save);
 }
 
 char	*ft_afternl(char *str)
 {
 	int		i;
 	int		j;
-	char	*line;
+	char	*save;
 
 	i = 0;
 	j = 0;
@@ -129,13 +129,13 @@ char	*ft_afternl(char *str)
 		free(str);
 		return (NULL);
 	}
-	line = (char *)malloc(sizeof(char) * (ft_strlen(str) - i + 1));
-	if (!line)
+	save = (char *)malloc(sizeof(char) * (ft_strlen(str) - i + 1));
+	if (!save)
 		return (NULL);
 	i++;
 	while (str[i])
-		line[j++] = str[i++];
-	line[j] = '\0';
+		save[j++] = str[i++];
+	save[j] = '\0';
 	free(str);
-	return (line);
+	return (save);
 }

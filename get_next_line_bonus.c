@@ -6,7 +6,7 @@
 /*   By: ssottori <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 16:43:35 by ssottori          #+#    #+#             */
-/*   Updated: 2023/12/11 16:25:17 by ssottori         ###   ########.fr       */
+/*   Updated: 2023/12/11 17:02:21 by ssottori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,15 @@ size_t	ft_strlen(const char *str)
 
 char	*get_next_line(int fd)
 {
-	static char	*buff[1024];
+	static char	*save[1024];
 	char		*line;
 
 	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
-	buff[fd] = ft_readfd(fd, buff[fd]);
-	if (!buff[fd])
+	save[fd] = ft_readfd(fd, save[fd]);
+	if (!save[fd])
 		return (NULL);
-	line = ft_line(buff[fd]);
-	buff[fd] = ft_afternl(buff[fd]);
+	line = ft_line(save[fd]);
+	save[fd] = ft_afternl(save[fd]);
 	return (line);
 }
