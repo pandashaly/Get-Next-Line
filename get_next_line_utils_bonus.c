@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ssottori <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 15:21:07 by ssottori          #+#    #+#             */
-/*   Updated: 2023/12/11 16:44:47 by ssottori         ###   ########.fr       */
+/*   Updated: 2023/12/11 16:26:26 by ssottori         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 /*isnewline - Returns 1 if a NL is found and 0 if a NL is not found.
  * Used in the loop condition of ft_read to know when 
@@ -114,9 +114,6 @@ char	*ft_readfd(int fd, char *fdata)
 	return (fdata);
 }
 
-/* afternl - used to extract and handle the remaining content of a string
- * after a newline char. We also update the save var which holds 
- * the content accumulated so far. */
 char	*ft_afternl(char *str)
 {
 	int		i;
